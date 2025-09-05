@@ -1,0 +1,41 @@
+# 00101 - Depreyve requirements
+
+################################################################################
+# D E F A U L T   P A C K A G E S
+################################################################################
+pip-review  # Interactive updates for installed Python packages
+pylint  # Python static code analysis tool
+rope  # Python refactoring library
+autopep8  # Auto-formats Python code to PEP 8
+black  # an uncompromising Python code formatter
+jupyter  # Interactive computing environment
+ipykernel  # IPython kernel for Jupyter
+ipython  # Enhanced interactive Python shell
+nbdime  # Diff and merge tools for Jupyter Notebooks
+numpy  # Numerical computing with arrays and matrices
+scipy  # Scientific computing library
+matplotlib  # Plotting library for visualizations
+
+
+################################################################################
+# O P T I O N A L   P A C K A G E S
+################################################################################
+# mpmath  # Arbitrary-precision arithmetic library
+# filelock  # Allows file-locking
+h5py  # HDF5 interface for large datasets
+pandas  # Data manipulation and analysis library
+joblib  # Efficient serialization for Python objects
+seaborn
+sympy
+
+################################################################################
+# A D D I T I O N A L   P A C K A G E S
+################################################################################
+# opencv-python  # Computer vision, image processing, and machine learning
+# pyside6  # Official PyQt (Qt6== framework) for GUI development
+# pyqtgraph  # Fast data visualization and GUI library
+# vidgear  # High-performance video processing Python library
+# hikvisionapi  # Wrapper for interfacing with hikVision cameras through ISAPI
+# ultralytics  # Deep learning models for computer vision tasks (e.g. YOLO)
+# omegaconf  #  hierarchical configuration library
+# noise  # provides Perlin and simplex noise for procedural generation
