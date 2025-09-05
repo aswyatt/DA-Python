@@ -1,13 +1,26 @@
 # %% [markdown]
 # # Step-Index Fibre
 # 
-# Refractive index:
+# The number of modes that a fibre can support can be approximated by the expression
+# $$
+# N_m \approx \frac{V^2}{2}.
+# $$
+# where
+# $$
+# V = a k_0 \text{NA}.
+# $$
+# 
+# However, a complete analysis is required to obtain the exact number.
+# 
+# ## Analytic Derivation
+# 
+# The fibre is subject to the refractive index profile
 # $$
 # n(r\leq a) = n_\mathrm{core}\\
 # n(r > a) = n_\mathrm{clad}\\
 # $$
 # 
-# and boundary conditions
+# and field subject to the boundary conditions
 # $$
 # E(r^{(-)}=a) = E(r^{(+)}=a)\\
 # E^\prime(r^{(-)}=a) = E^\prime(r^{(+)}=a)
@@ -39,59 +52,17 @@
 # n_\mathrm{clad} \leq \beta_{lm}/k_0 \leq n_\mathrm{core}
 # $$ 
 # 
-# Thus $u_{lm}^\text{max} = V$.
-# 
-# **Note that for $l=0$, there is also a solution for the first root larger than V**
-# 
-# The above expressions ensure continuity across the boundary, but it is also necessary to enforce a continuous gradient, yielding the following expression.
-# 
+# From this, taking the negative signs, one can conclude
 # $$
-# u_{lm} \frac{
-#     J_{l\pm 1}\left(u_{lm}\right)
-# }{
-#     J_{l}\left(u_{lm}\right)
-# } = \pm w_{lm} \frac{
-#     K_{l\pm 1}\left(w_{lm}\right)
-# }{
-#     K_{l}\left(w_{lm}\right)
-# }
+# j_{l-1,m} < V < j_{l,m}
 # $$
-# Note that $u_{lm}$ does not correspond to the zeros of the Bessel function.
+# where the roots of the Bessel function are labelled $j_{lm}$, i.e.$J_l(j_{lm}) = 0$.
 # 
-# This transcendental equation is easier to solve with the following expressions for the normalized frequency, $V$, and normalized propagation constants, $b_{lm}$ respectively:
-# $$
-# V = \sqrt{u_{lm}^2 + w_{lm}^2}
-# = a k_0 \sqrt{n_\mathrm{core}^2 - n_\mathrm{clad}^2}
-# = a k_0 \mathrm{NA}
-# = a k_0 n_\mathrm{core} \sqrt{2\Delta}\\
-# 
-# b_{lm} = 1 - \left(\frac{u_{lm}}{w_{lm}}\right)^2
-# = \left(\frac{w_{lm}}{V}\right)^2
-# = \frac{\left(\frac{\beta_{lm}}{k_0}\right)^2 - n_\mathrm{clad}^2}{(n_\mathrm{core}^2 - n_\mathrm{clad}^2)}
-# = \frac{\bar{n}^2 - n_\mathrm{clad}^2}{\mathrm{NA}^2}
-# $$
-# 
-# leading to the substitutions 
-# $$
-# w_{lm} = V \sqrt{b_{lm}},\quad
-# u_{lm} = V \sqrt{1 - b_{lm}}.
-# $$ 
-# Note the subscripts $lm$ are often dropped from the expressions for $u$, $w$, $b$ and $\beta$, although they are mode dependent; $V$, the normalized frequency, however is mode independent and is a parameter of the fibre itself.
-# 
-# The number of modes that a fibre can support can be approximated by the expression
-# $$
-# N_m \approx \frac{V^2}{2}.
-# $$
-# 
-# The exact number of modes can be found by solving the transcendtal boundary condition equation above, which is detailed in the code below.
+# **Note that for $l=0$, there is also an additional solution for the fundamental mode**
 
 # %%
 import numpy as np
-from numpy.typing import NDArray
-from scipy import special, optimize
-
-# # Smallest difference from 1
-eps = np.spacing(1)
+from scipy import special
 
 PI = np.pi
 TAU = 2*PI
@@ -101,7 +72,7 @@ TAU = 2*PI
 
 # %%
 # Refractive index of bulk fused silica (SiO2) - Malitson (1965)
-def ref_index_fused_silica(l_um: NDArray) -> NDArray:
+def ref_index_fused_silica(l_um):
     return np.sqrt(
         1
         + 0.6961663 / (1 - (0.0684043 / l_um) ** 2)
@@ -111,18 +82,15 @@ def ref_index_fused_silica(l_um: NDArray) -> NDArray:
 
 # Calculate the maximum number of modes (propagation constant must be real)
 #  u_max = V
-def roots(V: float, l: int = 0, Nm: int = 10):
+def num_modes(V: float, l: int = 0, Nm: int = 10):
+    j_lm = lambda Nm: special.jn_zeros(l-1, Nm)
     Nm = max(Nm, 1)
-    root_lm = special.jn_zeros(l, Nm)
-    # if l==0 and V<=root_lm[0]:
-        # return root_lm[:1]
-    while root_lm[-1] < V:
+    roots_lm1 = j_lm(Nm)
+    while roots_lm1[-1] < V:
         Nm *= 2
-        root_lm = special.jn_zeros(l, Nm)
-    # Number of solutions.
+        roots_lm1 = j_lm(Nm)
     # For l=0, include the first root larger than V
-    Nm = sum(root_lm < V).item() + (l==0)
-    return (root_lm[:Nm], Nm)
+    return sum(roots_lm1 < V).item() + (l==0)
 
 # %% [markdown]
 # ## Define Fibre Parameters
@@ -132,7 +100,7 @@ l0 = 633e-3 # Wavelength [um]
 k0 = TAU/l0
 d = 10 # Core diameter [um]
 a = d/2 # Fibre radius [um]
-NA = 0.1 # Numerical aperture
+NA = 0.12 # Numerical aperture
 
 n_clad = ref_index_fused_silica(l0) # Ref. index of cladding
 n_core = np.sqrt(NA**2 + n_clad**2) # Ref. index of core
@@ -149,16 +117,14 @@ V = a * k0 * NA
 # For $l\geq1$, there are 4 modes per root ($\pm l$ and two polarizations).
 
 # %%
-u_lm = []
 N_lm = []
 l = 0
 while True:
-    u, N = roots(V, l)
-    if N == 0:
+    if (Nm := num_modes(V, l))==0:
         break
-    u_lm.append(u)
-    N_lm.append(N)
+    N_lm.append(Nm)
     l += 1
+print(N_lm, 2*N_lm[0] + 4*sum(N_lm[1:]))
 
 # %% [markdown]
 # ### Check Modes
@@ -169,8 +135,8 @@ while True:
 print(f"V = {V:.6f}")
 Nl = len(N_lm)
 for l in range(Nl+1):
-    N = N_lm[l]+1 if l<Nl else 1
-    print(f"{l = }:", special.jn_zeros(l, N))
+    Nm = N_lm[l] if l<Nl else 0
+    print(f"{l = }, {Nm=}:", special.jn_zeros(l-1, Nm+1))
 
 # %% [markdown]
 # ## Display Results
