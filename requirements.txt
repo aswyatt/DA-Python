@@ -27,6 +27,9 @@ pandas  # Data manipulation and analysis library
 joblib  # Efficient serialization for Python objects
 seaborn
 sympy
+openpyxl # Used to load xlsx
+google-generativeai # Access to Gemini Pro LLM
+keyring # System level authentication
 
 ################################################################################
 # A D D I T I O N A L   P A C K A G E S
