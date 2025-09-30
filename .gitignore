@@ -192,3 +192,11 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+Interview/Data Analysis 1/human eval_ Bard_vs_ChatGPT - human eval_ Bard_vs_ChatGPT.csv
+Interview/Data Analysis 1/human eval_ Bard_vs_ChatGPT.xlsx
+Interview/TPM 2/Calendar.txt
+Interview/TPM 2/Emails.txt
+Interview/TPM 2/Meetings.txt
+Interview/TPM 2/Slack.txt
+Interview/TPM 2/Spec.txt
+Interview/TPM 2/Tickets.txt
