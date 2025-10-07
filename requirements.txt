@@ -30,6 +30,9 @@ sympy
 openpyxl # Used to load xlsx
 google-generativeai # Access to Gemini Pro LLM
 keyring # System level authentication
+wordcloud
+nltk # Natural Language Toolkit
+scikit-learn
 
 ################################################################################
 # A D D I T I O N A L   P A C K A G E S
